@@ -61,6 +61,6 @@ def csv_to_dict(csvpath, output_type):
 if __name__ == "__main__":
     #load in example file
 
-    print(csv_to_dict("src/test/Test.csv", "column"))
+    print(csv_to_dict("test/Test.csv", "column"))
 
     pass
