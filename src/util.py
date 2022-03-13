@@ -3,6 +3,13 @@
 
 # outputs a csv as a dictionary
 # outputtype : Row or Columns as dictionary keys, "row", "column", "raw"
+from tkinter import Frame, Text, Button
+from tkinter.filedialog import askopenfile, askopenfilename, asksaveasfile
+
+MONTHS = ["J","F","M","A","M","J","J","A","S","O","N","D"]
+NUM = [1, 2 , 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+
+
 def csv_to_dict(csvpath, output_type):
 
     out = {}
@@ -13,7 +20,7 @@ def csv_to_dict(csvpath, output_type):
         for line in openobj:
             raw.append(line.split(";"))
 
-    #remove useless vals
+    #remove useless vals / convert to numbers or bools
     temp = []
     for line in raw:
         a = []
@@ -21,7 +28,13 @@ def csv_to_dict(csvpath, output_type):
         for thing in line:
             if thing in ('', '\r\n', '\n'):
                 continue
-            a.append(thing)
+
+            try:
+                thing = float(thing)
+            except ValueError:
+                pass
+            finally: 
+                a.append(thing)
         
         temp.append(a)
     
@@ -56,6 +69,35 @@ def csv_to_dict(csvpath, output_type):
         out = raw
 
     return out
+
+#custom frame that packs a simple gui thingy
+class gui_get_file(Frame):
+
+    def __init__(self, master, filetypes, save) -> None:
+        super().__init__(master)
+        #add the widgets to this
+        self.txt = Text(self, state="disabled")
+        self.txt.pack(side="left")
+
+        if save:
+            Button(self, text="Save", command=self.save_file).pack(side="right")
+        else:
+            Button(self, text="Open", command=self.open_file).pack(side="right")
+
+
+        self.path = None
+        self.filetypes = filetypes
+
+    def open_file(self):
+        self.path = askopenfile(filetypes=self.filetypes)
+        self.txt.insert(1.0, self.path)
+
+    def save_file(self):
+        self.path = asksaveasfile(filetypes=self.filetypes)
+        self.txt.insert(1.0, self.path)
+    
+    def get_path(self):
+        return self.path
 
 
 if __name__ == "__main__":
