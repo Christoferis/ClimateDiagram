@@ -1,9 +1,9 @@
 #little script to generate Walther-Lieth style Climate diagrams
 from matplotlib import axes, figure, pyplot
-from numpy import arange
 from tkinter import Tk, Label, Text, Button, Frame
 
 import util
+from walter_lieth import walter, lieth
 
 #vars
 
@@ -59,19 +59,39 @@ def plot(diagram_info):
 
     data = util.csv_to_dict(csvpath=diagram_info, output_type="column")
     fig, y1 = pyplot.subplots()
+    
+    # y1.set_aspect(0.2)
+    y1.plot(util.NUM, data["Temperatur"], color="red")
+    y1.set_yticks([-20, -10, 0, 10, 20, 30, 40])
+    y1.set_ylim(0, 40)
 
-    print(data)
-
-    y1.plot(util.NUM, data["\ufeffNiederschlag"])
-    #TODO Rewrite https://matplotlib.org/stable/gallery/subplots_axes_and_figures/two_scales.html#sphx-glr-gallery-subplots-axes-and-figures-two-scales-py
-    #build the initial figure
-    #y1
-
-    #x
-
+    y2 = y1.twinx()
+    # y2.set_yscale("function", functions=(walter, lieth))
+    y2.set_yticks([0, 20, 40, 60, 80, 100, 200, 300, 500])
+    y2.set_ylim(0, 80)
+    y2.plot(util.NUM, data["\ufeffNiederschlag"])
 
     #plot the data
-    # y1.plot(util.NUM, data["Temperatur"])
+
+    #plot Candy
+
+    #adding arrid and humid indicators
+    for i in enumerate(data["Temperatur"]):
+        #arrid
+        if i[1] * 2 > data["\ufeffNiederschlag"][i[0]]:
+            y1.vlines(x=[i[0] + 1], ymin=data["\ufeffNiederschlag"][i[0]] / 2, ymax=i[1], linestyles="dotted", colors=["red"])
+        #humid
+        else:
+            y2.vlines(x=[i[0] + 1], ymax=data["\ufeffNiederschlag"][i[0]], ymin=i[1] * 2, linestyles="solid")
+
+        pass
+
+    y1.axhline(y=0, xmax=1, xmin=0, color="black", linewidth=1)
+
+    #Months
+    y1.set_xticks(util.NUM)
+    y1.set_xticklabels(util.MONTHS)
+
 
 
     pyplot.show()
