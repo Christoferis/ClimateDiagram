@@ -4,7 +4,7 @@
 # outputs a csv as a dictionary
 # outputtype : Row or Columns as dictionary keys, "row", "column", "raw"
 from tkinter import Frame, Text, Button
-from tkinter.filedialog import askopenfile, askopenfilename, asksaveasfile
+from tkinter.filedialog import askopenfilename, asksaveasfilename
 
 MONTHS = ["J","F","M","A","M","J","J","A","S","O","N","D"]
 NUM = [1, 2 , 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
@@ -107,14 +107,14 @@ class gui_get_file(Frame):
         self.filetypes = filetypes
 
     def open_file(self):
-        self.path = askopenfile(filetypes=self.filetypes)
+        self.path = askopenfilename(filetypes=self.filetypes)
         try:
             self.txt.insert(1.0, self.path)
         except Exception:
             self.txt.insert(1.0, "")
 
     def save_file(self):
-        self.path = asksaveasfile(filetypes=self.filetypes)
+        self.path = asksaveasfilename(filetypes=self.filetypes)
 
         try:
             self.txt.insert(1.0, self.path)

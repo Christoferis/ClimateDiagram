@@ -1,6 +1,6 @@
 #little script to generate Walther-Lieth style Climate diagrams
 from sys import argv
-from tkinter import Button, Checkbutton, Frame, Label, Text, Tk
+from tkinter import END, BooleanVar, Button, Checkbutton, Frame, Label, Text, Tk
 from tkinter.ttk import Combobox
 
 from matplotlib import axes, figure, pyplot
@@ -37,7 +37,9 @@ def gui():
     rw["values"] = ("per Column", "per Row")
     rw.pack()
 
-    prev = Checkbutton(spec, text="Preview")
+    pr = BooleanVar()
+
+    prev = Checkbutton(spec, text="Preview", variable=pr)
     prev.pack()
 
     spec.pack(side="bottom")
@@ -69,7 +71,7 @@ def gui():
 
     # button and other stuff
     end = Frame(window)
-    Button(end, text="Create a Diagram", command=lambda: validate()).pack()
+    Button(end, text="Create a Diagram", command=lambda: validate(dataset=dataset.get_path(), output=output.get_path(), read=rw.get(), city=w_place.get(1.0, "end"), country=w_cou.get(1.0, "end"), coords=e_coo.get(1.0, "end"), elevation=e_ele.get(1.0, "end"), prev=pr.get())).pack()
 
     end.pack()
 
@@ -94,13 +96,16 @@ def validate(dataset, output, read, prev, city, coords, country, elevation):
         raise util.MissingInfoException("Please choose a Read in Type. If you are unsure please Choose 'per Column' Read in Type")
 
     #plot the thingy
+
+    print({"path": dataset, "output": output, "read-mode": read, "preview": prev, "city": city, "coords": coords, "country": country, "elevation": elevation})
+
     plot({"path": dataset, "output": output, "read-mode": read, "preview": prev, "city": city, "coords": coords, "country": country, "elevation": elevation})
 
     pass
 
 def plot(diagram_info):
 
-    data = util.csv_to_dict(csvpath=diagram_info["path"], output_type="column" if diagram_info["read-mode"] == "per column" else "row")
+    data = util.csv_to_dict(csvpath=diagram_info["path"], output_type="column" if diagram_info["read-mode"] == "per Column" else "row")
     fig, y1 = pyplot.subplots()
 
     print(data)
@@ -161,7 +166,7 @@ def plot(diagram_info):
     y1.set_xlabel("Months")
     y2.set_ylabel("Rainfall in mm")
 
-    if diagram_info["prev"]:
+    if diagram_info["preview"]:
         pyplot.show()
     else:
         pyplot.savefig(diagram_info["output"])
