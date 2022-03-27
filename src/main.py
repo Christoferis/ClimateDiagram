@@ -91,7 +91,7 @@ def validate(dataset, output, read, prev, city, coords, country, elevation):
             raise util.MissingInfoException("Output Path is Missing!")
     
     if read in (None, ""):
-        raise util.MissingInfoException("")
+        raise util.MissingInfoException("Please choose a Read in Type. If you are unsure please Choose 'per Column' Read in Type")
 
     #plot the thingy
     plot({"path": dataset, "output": output, "read-mode": read, "preview": prev, "city": city, "coords": coords, "country": country, "elevation": elevation})
@@ -100,7 +100,7 @@ def validate(dataset, output, read, prev, city, coords, country, elevation):
 
 def plot(diagram_info):
 
-    data = util.csv_to_dict(csvpath=diagram_info["path"], output_type="column")
+    data = util.csv_to_dict(csvpath=diagram_info["path"], output_type="column" if diagram_info["read-mode"] == "per column" else "row")
     fig, y1 = pyplot.subplots()
 
     print(data)
@@ -160,13 +160,20 @@ def plot(diagram_info):
     y1.set_ylabel("Temperature in °C")
     y1.set_xlabel("Months")
     y2.set_ylabel("Rainfall in mm")
-    pyplot.show()
+
+    if diagram_info["prev"]:
+        pyplot.show()
+    else:
+        pyplot.savefig(diagram_info["output"])
     
     pass
 
 def main():
-    gui()
-    pass
+    try:
+        gui()
+    except Exception as e:
+        print(e.with_traceback())
+        pass
 
 
 if __name__ == "__main__":

@@ -85,6 +85,8 @@ class MissingInfoException(Exception):
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
 
+#error screen
+
 
 #custom frame that packs a simple gui thingy
 class gui_get_file(Frame):
