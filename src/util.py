@@ -9,6 +9,9 @@ from tkinter.filedialog import askopenfile, askopenfilename, asksaveasfile
 MONTHS = ["J","F","M","A","M","J","J","A","S","O","N","D"]
 NUM = [1, 2 , 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 
+def nothing():
+    return ""
+
 
 def csv_to_dict(csvpath, output_type):
 
@@ -43,16 +46,21 @@ def csv_to_dict(csvpath, output_type):
 
     #depending on outputtype
     if output_type == "column":
-        keys = raw.pop(0)
+        form = raw.pop(0)
+        keys = []
 
         #create list
-        for key in keys:
-            out[key] = []
+        for key in form:
+            if type(key) is str:
+                key = key.removeprefix("\ufeff")
+
+            keys.append(key)
+            out[key] = []        
 
         for i in raw:
-            for j in range(len(i)):
+            for j in enumerate(i):
                 try:
-                    out[keys[j]].append(i[j])
+                    out[keys[j[0]]].append(j[1])
                 except IndexError:
                     continue
 

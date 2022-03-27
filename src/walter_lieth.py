@@ -1,8 +1,26 @@
+from matplotlib.scale import LinearScale
+from matplotlib.transforms import Transform, IdentityTransform
 
-#two functions apparently
-# x is an array btw
-def walter(x):
-    return x 
+#custom scale: inheriting from LinearScale because its easier
 
-def lieth(x):
-    return -x 
+class walter_lieth(LinearScale):
+
+    name = "walter_lieth"
+
+    def __init__(self) -> None:
+        super().__init__()
+
+    def set_default_locators_and_formatters():
+        super().set_default_locators_and_formatters()
+
+
+    def get_transform(self):
+
+        IdentityTransform
+
+
+
+
+
+if __name__ == "__main__":
+    pass
