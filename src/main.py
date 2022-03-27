@@ -1,33 +1,46 @@
 #little script to generate Walther-Lieth style Climate diagrams
+from sys import argv
+from tkinter import Button, Checkbutton, Frame, Label, Text, Tk
+from tkinter.ttk import Combobox
+
 from matplotlib import axes, figure, pyplot
-from tkinter import Tk, Label, Text, Button, Frame
+
+import util
 
 nieder_scale = 120
 temp = "Temperatur"
 nieder = "Niederschlag"
 
 
-import util
-# from walter_lieth import walter, lieth
-
-#vars
-
-def compile():
-    pass
 
 def gui():
-    diagram_info = {}
-
     window = Tk()
     window.title("Climate Diagrams by Christoferis")
 
-
     #Diagram, output and everything
     data = Frame(window)
-    Label(data, text="Dataset").pack()
-    dataset = util.gui_get_file(master=data, filetypes=[("CSV-File", "*.csv")], save=False)
+    io = Frame(data)
+    Label(io, text="Dataset").pack()
+    dataset = util.gui_get_file(master=io, filetypes=[("CSV-File", "*.csv")], save=False)
     dataset.pack()
 
+    Label(io, text="Output").pack()
+    output = util.gui_get_file(master=io, save=True, filetypes=[("PDF-Document", "*.pdf"), ("Scalable Vector Graphics", "*.svg")] )
+    output.pack()
+    io.pack()
+
+    #add in more stuff
+    spec = Frame(data)
+    #add in Spinbox for Column Checkboxes preview
+    Label(spec, text="Read in").pack()
+    rw = Combobox(spec, state="readonly")
+    rw["values"] = ("per Column", "per Row")
+    rw.pack()
+
+    prev = Checkbutton(spec, text="Preview")
+    prev.pack()
+
+    spec.pack(side="bottom")
     data.pack()
 
     #Frame for additional Info + TODO: Radiobutton to activate it
@@ -36,23 +49,29 @@ def gui():
     #Weather Station
     weather = Frame(info)
     Label(weather, text="Weather Station / Country").pack()
-    w_place = Text(weather)
-    w_place.pack(side="left")
-    w_cou = Text(weather)
-    w_cou.pack(side="right")
+    w_place = Text(weather, height=1, width=25)
+    w_place.pack(side="left", expand=0, fill="x")
+    w_cou = Text(weather, height=1, width=25)
+    w_cou.pack(side="right", expand=0, fill="x")
     weather.pack()
 
     #Coordinates, Elevation
     extra = Frame(info)
     Label(extra, text="Elevation").pack()
-    e_ele = Text(extra)
+    e_ele = Text(extra, height=1, width=50)
     e_ele.pack()
     Label(extra, text="Weather Station Coordinates").pack()
-    e_coo = Text(extra)
+    e_coo = Text(extra, height=1, width=50)
     e_coo.pack()
     extra.pack(side="bottom")
 
     info.pack()
+
+    # button and other stuff
+    end = Frame(window)
+    Button(end, text="Create a Diagram", command=lambda: validate()).pack()
+
+    end.pack()
 
     #TODO: Options
     #include chart
@@ -60,9 +79,28 @@ def gui():
 
     window.mainloop()
 
+#compile and validate certain parts
+def validate(dataset, output, read, prev, city, coords, country, elevation):
+
+    #validate all of those things
+    if dataset in (None, ""):
+        raise util.MissingInfoException("Input Dataset is Missing!")
+
+    if output in (None, ""):
+        if prev is False:
+            raise util.MissingInfoException("Output Path is Missing!")
+    
+    if read in (None, ""):
+        raise util.MissingInfoException("")
+
+    #plot the thingy
+    plot({"path": dataset, "output": output, "read-mode": read, "preview": prev, "city": city, "coords": coords, "country": country, "elevation": elevation})
+
+    pass
+
 def plot(diagram_info):
 
-    data = util.csv_to_dict(csvpath=diagram_info, output_type="column")
+    data = util.csv_to_dict(csvpath=diagram_info["path"], output_type="column")
     fig, y1 = pyplot.subplots()
 
     print(data)
@@ -88,7 +126,6 @@ def plot(diagram_info):
     #plot the data
 
     #plot Candy
-
     #adding arrid and humid indicators
     for i in enumerate(data["Temperatur"]):
         #arrid double the points
@@ -119,7 +156,7 @@ def plot(diagram_info):
 
 
     #All other stuff that has to be mentioned
-    # y1.set_title(f"{diagram_info['city']} / {diagram_info['country']} \n {diagram_info['coords'] if diagram_info['coords'] != None else util.nothing()}")
+    y1.set_title(f"{diagram_info['city']} / {diagram_info['country']} \n {diagram_info['coords'] if diagram_info['coords'] != None else util.nothing()}")
     y1.set_ylabel("Temperature in °C")
     y1.set_xlabel("Months")
     y2.set_ylabel("Rainfall in mm")
@@ -133,5 +170,5 @@ def main():
 
 
 if __name__ == "__main__":
-    # main()
-    plot("test/Test.csv")
+    main()
+    # plot("test/Test.csv")

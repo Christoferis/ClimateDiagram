@@ -78,13 +78,21 @@ def csv_to_dict(csvpath, output_type):
 
     return out
 
+#custom Exception
+
+class MissingInfoException(Exception):
+
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
+
+
 #custom frame that packs a simple gui thingy
 class gui_get_file(Frame):
 
     def __init__(self, master, filetypes, save) -> None:
         super().__init__(master)
         #add the widgets to this
-        self.txt = Text(self, state="disabled")
+        self.txt = Text(self, state="disabled", height=1, width=50)
         self.txt.pack(side="left")
 
         if save:
@@ -98,11 +106,18 @@ class gui_get_file(Frame):
 
     def open_file(self):
         self.path = askopenfile(filetypes=self.filetypes)
-        self.txt.insert(1.0, self.path)
+        try:
+            self.txt.insert(1.0, self.path)
+        except Exception:
+            self.txt.insert(1.0, "")
 
     def save_file(self):
         self.path = asksaveasfile(filetypes=self.filetypes)
-        self.txt.insert(1.0, self.path)
+
+        try:
+            self.txt.insert(1.0, self.path)
+        except Exception:
+            self.txt.insert(1.0, "")
     
     def get_path(self):
         return self.path
