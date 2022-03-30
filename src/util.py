@@ -33,7 +33,7 @@ def csv_to_dict(csvpath, output_type):
                 continue
 
             try:
-                thing = float(thing)
+                thing = float(thing.replace(",", "."))
             except ValueError:
                 pass
             finally: 
@@ -53,6 +53,9 @@ def csv_to_dict(csvpath, output_type):
         for key in form:
             if type(key) is str:
                 key = key.removeprefix("\ufeff")
+                key = key.removesuffix("\ufeff")
+                key = key.removeprefix("\n")
+                key = key.removesuffix("\n")
 
             keys.append(key)
             out[key] = []        
@@ -94,7 +97,7 @@ class gui_get_file(Frame):
     def __init__(self, master, filetypes, save) -> None:
         super().__init__(master)
         #add the widgets to this
-        self.txt = Text(self, state="disabled", height=1, width=50)
+        self.txt = Text(self, state="normal", height=1, width=50)
         self.txt.pack(side="left")
 
         if save:
@@ -109,17 +112,19 @@ class gui_get_file(Frame):
     def open_file(self):
         self.path = askopenfilename(filetypes=self.filetypes)
         try:
+            self.txt.config(state="normal")
             self.txt.insert(1.0, self.path)
-        except Exception:
-            self.txt.insert(1.0, "")
+        finally:
+            self.txt.config(state="disabled")
 
     def save_file(self):
         self.path = asksaveasfilename(filetypes=self.filetypes)
 
         try:
+            self.txt.config(state="normal")
             self.txt.insert(1.0, self.path)
-        except Exception:
-            self.txt.insert(1.0, "")
+        finally:
+            self.txt.config(state="disabled")
     
     def get_path(self):
         return self.path
