@@ -5,6 +5,7 @@
 # outputtype : Row or Columns as dictionary keys, "row", "column", "raw"
 from tkinter import Frame, Text, Button
 from tkinter.filedialog import askopenfilename, asksaveasfilename
+from typing import Union
 
 MONTHS = ["J","F","M","A","M","J","J","A","S","O","N","D"]
 NUM = [1, 2 , 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
@@ -13,7 +14,7 @@ def nothing():
     return ""
 
 
-def csv_to_dict(csvpath, output_type):
+def csv_to_dict(csvpath, output_type) -> Union[list, dict]:
 
     out = {}
     raw = []
@@ -36,7 +37,7 @@ def csv_to_dict(csvpath, output_type):
                 thing = float(thing.replace(",", "."))
             except ValueError:
                 pass
-            finally: 
+            finally:
                 a.append(thing)
         
         temp.append(a)
@@ -75,6 +76,12 @@ def csv_to_dict(csvpath, output_type):
             for i in range(1, len(list)):
                 out[list[0]].append(list[i])
     
+    #output type for two dimensional list output as {keys: [2d], matrix }
+    elif output_type == "matrix":
+        #get keys
+
+        pass
+    
     else:
         #just output the normal thing
         out = raw
@@ -111,6 +118,8 @@ class gui_get_file(Frame):
 
     def open_file(self):
         self.path = askopenfilename(filetypes=self.filetypes)
+        self.reset()
+
         try:
             self.txt.config(state="normal")
             self.txt.insert(1.0, self.path)
@@ -119,6 +128,7 @@ class gui_get_file(Frame):
 
     def save_file(self):
         self.path = asksaveasfilename(filetypes=self.filetypes)
+        self.reset()
 
         try:
             self.txt.config(state="normal")
@@ -128,6 +138,9 @@ class gui_get_file(Frame):
     
     def get_path(self):
         return self.path
+    
+    def reset(self):
+        self.txt.delete(1.0, "end")
 
 
 if __name__ == "__main__":
